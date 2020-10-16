@@ -94,9 +94,11 @@ class MarketNews:
         if weeknumber > 4: 
             print("Entered date is a weekend. Using previous non-weekend date.")
             if weeknumber == 6:
-                weeknumber = formatted_date - 2
+                formatted_date = formatted_date - datetime.timedelta(days=2)
+                end_date = end_date - datetime.timedelta(days=2)
             else:
-                weeknumber = formatted_date - 1
+                formatted_date = formatted_date - datetime.timedelta(days=1)
+                end_date = end_date - datetime.timedelta(days=1)
                 
         for k in kwargs:
             if k == "end_date":
@@ -105,9 +107,9 @@ class MarketNews:
                 if weeknumber > 4:
                     print("Entered end date is a weekend. Using previous non-weekend date.")
                     if weeknumber == 6:
-                        weeknumber = end_date - 2
+                        end_date = end_date - datetime.timedelta(days=2)
                     else:
-                        weeknumber = end_date - 1
+                        end_date = end_date - datetime.timedelta(days=1)
                         
         start_year = str(formatted_date.year)
         start_month = str(formatted_date.month)
@@ -130,8 +132,8 @@ class MarketNews:
         if file_type == "text":
             url = url_stub + '&format=text' + self.__rebuild
             self._download_txt(url, path)
-        elif file_type == "xlsx":
-            url = url_stub + '&format=xlsx' + self.__rebuild
+        elif file_type == "xls":
+            url = url_stub + '&format=excel' + self.__rebuild
             self._download_excel(url, path)
         elif file_type == "xml":
             url = url_stub + '&format=xml' + self.__rebuild

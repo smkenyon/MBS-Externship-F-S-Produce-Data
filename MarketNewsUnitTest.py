@@ -36,17 +36,59 @@ class TestMarketNews(unittest.TestCase):
         self.news._download_excel(url)
         
     def test_get_data_file_abr_lookup(self):
-        lookup_abr_v = 'POTS'
         lookup_name_v = 'POTATOES'
-        lokup_abr_f = 'APLCID'
         lookup_name_f = 'APPLE CIDER'
-        path_v = 'potatoes.text'
-        path_f = 'apple cider.text'
+        path_v = 'potatoes.txt'
+        path_f = 'apple cider.txt'
         out = self.news.get_data_file(lookup_name_f, '2020/10/15', path_f)
         out_v = self.news.get_data_file(lookup_name_v, '2020/10/15', path_v)
         print(out)
         print(out_v)
 
+    def test_get_data_file_lookup_not_found(self):
+        lookup_name = 'potatoes'
+        lookup_name2 = 'fries'
+        date = '2020/10/15'
+        path = 'blank.txt'
+        self.assertRaises(ValueError, self.news.get_data_file, lookup_name, date, path)
+        self.assertRaises(ValueError, self.news.get_data_file, lookup_name2, date, path)
+    
+    def test_get_data_file_force_weekday(self):
+        weekend_date_sat = '2020/10/10'
+        weekend_date_sun = '2020/10/11'
+        path = 'sat.txt'
+        path = 'sun.txt'
+        lookup_name = 'POTATOES'
+        url_sat = self.news.get_data_file(lookup_name, weekend_date_sat, path)
+        url_sun = self.news.get_data_file(lookup_name, weekend_date_sun, path)
+        self.assertEqual(url_sat, url_sun)
+
+    def test_get_data_file_not_implemented(self):
+        name = 'POTATOES'
+        date = '2020/10/15'
+        path = 'blah.txt'
+        self.assertRaises(NotImplementedError, self.news.get_data_file, name, date, path, file_type="xlsx")
+    
+    def test_get_data_file_bad_date(self):
+        date = '10/15/2020'
+        date2 = '10-15-2020'
+        name = 'POTATOES'
+        path = 'blah.txt'
+        self.assertRaises(ValueError, self.news.get_data_file, name, date, path)
+        self.assertRaises(ValueError, self.news.get_data_file, name, date2, path)
+    
+    def test_get_data_file_one_week(self):
+        start_date = '2020/10/5'
+        end_date = '2020/10/9'
+        name = 'POTATOES'
+        path = 'one_week.xls'
+        self.news.get_data_file(name, start_date, path, file_type='xls', end_date=end_date)
+    
+    def test_get_date_file_xml(self):
+        date = '2020/10/15'
+        name = 'POTATOES'
+        self.news.get_data_file(name, date, 'blah.xml', file_type='xml')
+    
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(TestMarketNews)
     unittest.TextTestRunner().run(suite)
