@@ -56,6 +56,15 @@ class MarketNews:
         except:
             print("File not downloaded")
             raise TimeoutError
+
+    def _stream_xml(self):
+        pass
+
+    def _stream_txt(self):
+        pass
+
+    def _stream_excel(self):
+        pass
          
     def get_data_file(self, name, date, path, file_type="text", **kwargs):
         """
@@ -143,3 +152,11 @@ class MarketNews:
         #saved_path = None  # remove once formatting path is implemented
         return url
         
+    def stream_datafile(self, name, date, **kwargs):
+        """
+        name: str name of the fruit or vegetable
+        date: str, f%YYYY/%MM/%DD - start date
+        end_date: str, f%YYYY/%MM/%DD, defaults to date
+        returns: None
+        """
+        return None
