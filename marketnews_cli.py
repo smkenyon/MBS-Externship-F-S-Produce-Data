@@ -37,14 +37,14 @@ def main():
     news = MarketNews()
     file_type = save_file[-4:]
     if file_type == '.xls':
-        file_type = 'excel'
+        file_type = 'xls'
     elif file_type == '.txt':
         file_type = 'text'
     elif file_type == 'xlm':
         file_type = 'xlm'
     else:
         raise NotImplementedError  # additional MarketNews files include PDF, not supported at this time
-
+    
     news.get_data_file(commodity_name, start_date, save_file, file_type=file_type, end_date=end_date) 
 
 if __name__ == "__main__":
