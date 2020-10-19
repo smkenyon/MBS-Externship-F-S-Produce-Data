@@ -36,12 +36,13 @@ def main():
     if isinstance(end_date, datetime.date): end_date = end_date.strftime("%Y/%m/%d")
     news = MarketNews()
     file_type = save_file[-4:]
+    
     if file_type == '.xls':
         file_type = 'xls'
     elif file_type == '.txt':
         file_type = 'text'
-    elif file_type == 'xlm':
-        file_type = 'xlm'
+    elif file_type == '.xml':
+        file_type = 'xml'
     else:
         raise NotImplementedError  # additional MarketNews files include PDF, not supported at this time
     
