@@ -6,6 +6,7 @@ Date: 10/15/2020
 Copyright 2020, Rutgers MBS, NJBDA, F+S Produce
 """
 
+import pandas as pd
 import unittest
 from MarketNews import MarketNews
 
@@ -89,6 +90,19 @@ class TestMarketNews(unittest.TestCase):
         name = 'POTATOES'
         self.news.get_data_file(name, date, 'blah.xml', file_type='xml')
     
+    def test_stream_xml(self):
+        url = "https://www.marketnews.usda.gov/mnp/fv-report-top-filters?&commAbr=CARR&repType=termPriceDaily&navType=byComm&locName=&navClass=VEGETABLES&className=VEGETABLES&commName=CARROTS&type=termPrice&repDate=10%2F15%2F2020&endDate=10%2F15%2F2020&format=xml&rebuild=false"
+        self.assertRaises(NotImplementedError, self.news._stream_xml, url)
+
+    def test_stream_txt(self):
+        url = "https://www.marketnews.usda.gov/mnp/fv-report-top-filters?&commAbr=CARR&repType=termPriceDaily&navType=byComm&locName=&navClass=VEGETABLES&className=VEGETABLES&commName=CARROTS&type=termPrice&repDate=10%2F15%2F2020&endDate=10%2F15%2F2020&format=text&rebuild=false"
+        self.assertRaises(NotImplementedError, self.news._stream_txt, url)
+
+    def test_stream_excel(self):
+        url = "https://www.marketnews.usda.gov/mnp/fv-report-top-filters?&commAbr=CARR&repType=termPriceDaily&navType=byComm&locName=&navClass=VEGETABLES&className=VEGETABLES&commName=CARROTS&type=termPrice&repDate=10%2F15%2F2020&endDate=10%2F15%2F2020&format=excel&rebuild=false"
+        df = self.news._stream_excel(url)
+        self.assertIsInstance(df, pd.DataFrame)
+
 if __name__ == "__main__":
     suite = unittest.TestLoader().loadTestsFromTestCase(TestMarketNews)
     unittest.TextTestRunner().run(suite)
