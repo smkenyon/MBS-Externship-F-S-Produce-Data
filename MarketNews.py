@@ -3,7 +3,7 @@ MarketNews.py
 Data handling class and methods for USDA Market News Specialty Crop Data: https://www.marketnews.usda.gov/mnp/fv-home
 Author: Stephen Kenyon
 Date: 10/15/2020
-Copyright 2020, Rutgers MBS, NJBDA, F+S Produce
+Copyright 2020, Rutgers MBS, NJBDA, F&S Produce
 """
 
 import csv
