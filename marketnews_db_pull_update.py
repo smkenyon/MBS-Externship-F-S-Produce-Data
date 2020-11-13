@@ -22,7 +22,7 @@ def pull_all():
     files = os.listdir("data")
     if not files:
         news = MarketNews()
-        start_date = "2020/1/1"
+        start_date = "2020/10/1"  # limit to October 1st for testing, final version use 5 years
         end_date = datetime.date.today()
         end_date_format = str(end_date.year) + "/" + str(end_date.month) + "/" + str(end_date.day)
         str_start_date = "_2010_1_1_"
