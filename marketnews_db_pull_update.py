@@ -54,7 +54,7 @@ def pull_all():
             time.sleep(3)
 
 def update_all():
-    pass
+    raise NotImplementedError
 
 if __name__ == "__main__":
     create_data_folder()
