@@ -3,11 +3,12 @@ MarketNews.py
 Data handling class and methods for USDA Market News Specialty Crop Data: https://www.marketnews.usda.gov/mnp/fv-home
 Author: Stephen Kenyon
 Date: 10/15/2020
-Copyright 2020, Rutgers MBS, NJBDA, F+S Produce
+Copyright 2020, Rutgers MBS, NJBDA, F&S Produce
 """
 
 import csv
 import datetime
+import pandas as pd
 import requests
 import shutil
 
@@ -57,14 +58,23 @@ class MarketNews:
             print("File not downloaded")
             raise TimeoutError
 
-    def _stream_xml(self):
-        pass
+    def _stream_xml(self, url):
+        raise NotImplementedError
 
-    def _stream_txt(self):
-        pass
+    def _stream_txt(self, url):
+        raise NotImplementedError
 
-    def _stream_excel(self):
-        pass
+    def _stream_excel(self, url):
+        try:
+            with requests.get(url, stream=True) as r:
+                try:
+                    df = pd.read_html(r.text)[0]  # excel encoded as html, only need first DataFrame element
+                    return df
+                except:
+                    print("Error in excel file encoding.")
+        except:
+            print("File not downloaded")
+            raise TimeoutError
          
     def get_data_file(self, name, date, path, file_type="text", **kwargs):
         """
@@ -157,6 +167,71 @@ class MarketNews:
         name: str name of the fruit or vegetable
         date: str, f%YYYY/%MM/%DD - start date
         end_date: str, f%YYYY/%MM/%DD, defaults to date
-        returns: None
+        returns: pandas dataframe
         """
-        return None
+        abr = None
+        food_type = None
+        formatted_date = datetime.datetime.strptime(date, '%Y/%m/%d')
+        end_date = formatted_date
+        # check to see if name in dicts
+        for fruit in self.fruit_dict:
+            if name in self.fruit_dict[fruit]:
+                abr = fruit
+                food_type = "FRUITS"
+                break
+        for veg in self.veg_dict:
+            if name in self.veg_dict[veg]:
+                abr = veg
+                food_type = "VEGETABLES"
+                break
+        if abr is None:
+            print("Name not found.")
+            raise ValueError
+        
+        # Market News only supports weekday for data pulls
+        try:    
+            weeknumber = formatted_date.weekday()
+        except:
+            print("Date not formatted correctly / Invalid Date.")
+            raise ValueError
+            
+        if weeknumber > 4: 
+            print("Entered date is a weekend. Using previous non-weekend date.")
+            if weeknumber == 6:
+                formatted_date = formatted_date - datetime.timedelta(days=2)
+                end_date = end_date - datetime.timedelta(days=2)
+            else:
+                formatted_date = formatted_date - datetime.timedelta(days=1)
+                end_date = end_date - datetime.timedelta(days=1)
+                
+        for k in kwargs:
+            if k == "end_date":
+                end_date = datetime.datetime.strptime(kwargs[k], '%Y/%m/%d')
+                weeknumber = end_date.weekday()
+                if weeknumber > 4:
+                    print("Entered end date is a weekend. Using previous non-weekend date.")
+                    if weeknumber == 6:
+                        end_date = end_date - datetime.timedelta(days=2)
+                    else:
+                        end_date = end_date - datetime.timedelta(days=1)
+                        
+        start_year = str(formatted_date.year)
+        start_month = str(formatted_date.month)
+        start_day = str(formatted_date.day)
+        start = start_month + "%2F" + start_day + "%2F" + start_year
+        end_year = str(end_date.year)
+        end_month = str(end_date.month)
+        end_day = str(end_date.day)
+        end = end_month + "%2F" + end_day + "%2F" + end_year
+        
+        name_list = name.split()
+        if len(name_list) > 1:
+            name = name_list[0] + "+" + name_list[1]
+            
+        url = (self.__baselink + '&commAbr=' + abr + self.__repType + self.__navType
+                    + '&navClass=' + food_type + '&className='
+                    + food_type + '&commName=' + name + self.__type + '&repDate='
+                    + start + '&endDate=' + end + '&format=excel' + self.__rebuild)
+
+        df = self._stream_excel(url) 
+        return df
