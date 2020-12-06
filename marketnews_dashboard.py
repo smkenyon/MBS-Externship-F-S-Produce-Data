@@ -75,21 +75,28 @@ app.layout = html.Div([
         dcc.Graph(id='produce-time-series')
     ])
 ])
-"""
-@app.callback(
-    Output(),
-    Input()
-)
-def set_dropdowns():
-    pass
 
 @app.callback(
-    Output(),
-    Input()
+    Output('terminal-market', 'options'),
+    Output('origin', 'options'),
+    Input('commodity-selector', 'value')
 )
-def set_dropdowns_value():
-    pass
-"""
+def set_dropdowns(commodity_name):
+    global df
+    df = pd.read_csv("Data//" + dfs[commodity_name])
+    origin = df['Origin'].unique()
+    terminal_markets = df['City Name'].unique()
+    return [{'label': i, 'value': i} for i in terminal_markets], [{'label': i, 'value': i} for i in origin]
+
+@app.callback(
+    Output('terminal-market', 'value'),
+    Output('origin', 'value'),
+    Input('terminal-market', 'options'),
+    Input('origin', 'options')
+)
+def set_dropdowns_value(terminal_market_options, origin_options):
+    return terminal_market_options[0]['value'], origin_options[0]['value']
+
 @app.callback(
     Output('produce-time-series', 'figure'),
     Input('commodity-selector', 'value'),
@@ -97,8 +104,6 @@ def set_dropdowns_value():
     Input('origin', 'value')
 )
 def update_graph(commodity_name, terminal_market, origin_city):
-
-    df = pd.read_csv("Data//" + dfs[commodity_name])
     filtered = df[(df['City Name']==terminal_market) & (df['Origin']==origin_city)]
     midpoint = (filtered['High Price'] + filtered['Low Price'])/2
     midpoint.name = 'Midpoint Price'
